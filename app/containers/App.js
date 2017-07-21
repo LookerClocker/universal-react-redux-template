@@ -1,29 +1,33 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import {connect} from 'react-redux'
 import Helmet from 'react-helmet'
+import Header from './common/Header.js';
 
 class App extends Component {
-  render() {
-    return (
-      <div>
-
-        <Helmet
-          defaultTitle="Redux real-world example"
-          titleTemplate="%s - Redux real-world example"
-          meta={[
-            {"name": "description", "content": "A boilerplate doing universal/isomorphic rendering with Redux + React-router + Express"},
-          ]}
-          htmlAttributes={{"lang": "en"}}
-        />
-        {this.props.children}
-      </div>
-    )
-  }
+    render() {
+        return (
+            <div>
+                <Header/>
+                <Helmet
+                    defaultTitle="Redux real-world example"
+                    titleTemplate="%s - Redux real-world example"
+                    meta={[
+                        {
+                            "name": "description",
+                            "content": "A boilerplate doing universal/isomorphic rendering with Redux + React-router + Express"
+                        },
+                    ]}
+                    htmlAttributes={{"lang": "en"}}
+                />
+                {this.props.children}
+            </div>
+        )
+    }
 }
 
 function mapStateToProps(state) {
-  return {}
+    return {}
 }
 
 export default connect(mapStateToProps)(App)

@@ -9,22 +9,38 @@ import {Provider} from 'react-redux'
 import Helmet from 'react-helmet'
 import util from 'util';
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('fs');
+const path = require('path');
 
 let scriptSrcs;
 let styleSrc;
 
-function getDirectories(srcpath) {
+function getFiles(srcpath) {
     let components = [];
     for (let i = 0; i < fs.readdirSync(srcpath).length; i++) {
         if (fs.readdirSync(srcpath)[i].split('.').pop() === 'css') { // or js in future
             components.push(fs.readdirSync(srcpath)[i]);
         }
     }
+
+
+    let directories = fs.readdirSync(srcpath)
+        .filter(file => fs.lstatSync(path.join(srcpath, file)).isDirectory());
+
+    for (let j = 0; j < directories.length; j++) {
+
+        let arrayOfFiles = fs.readdirSync('dist/styles/' + directories[j]); // array of files in specific folder
+
+        for (let i = 0; i < arrayOfFiles.length; i++) {
+            if (arrayOfFiles[i].split('.').pop() === 'css') {
+                components.push(directories[j] + '/' + arrayOfFiles[i]);
+            }
+        }
+    }
+
+    console.log('-----------------------------', components);
+
     return components;
-    // return fs.readdirSync(srcpath);
-    // .filter(file => fs.lstatSync(path.join(srcpath, file)).isDirectory())
 }
 
 if (process.env.NODE_ENV === 'production') {
@@ -33,13 +49,13 @@ if (process.env.NODE_ENV === 'production') {
         `/${refManifest['vendor.js']}`,
         `/${refManifest['app.js']}`,
     ]
-    styleSrc = `/${refManifest[getDirectories('dist/styles')]}`
+    styleSrc = `/${refManifest[getFiles('dist/styles')]}`
 } else {
     scriptSrcs = [
         '/vendor.js',
         '/app.js'
     ]
-    styleSrc = getDirectories('dist/styles');
+    styleSrc = getFiles('dist/styles');
 }
 
 
