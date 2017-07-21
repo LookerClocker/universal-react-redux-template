@@ -15,8 +15,17 @@ const path = require('path');
 let scriptSrcs;
 let styleSrc;
 
+/**
+ * Get css files and add them to index.ejs
+ * @param srcpath
+ * @returns {Array}
+ */
 function getFiles(srcpath) {
     let components = [];
+
+    /**
+     * First wrap level
+     */
     for (let i = 0; i < fs.readdirSync(srcpath).length; i++) {
         if (fs.readdirSync(srcpath)[i].split('.').pop() === 'css') { // or js in future
             components.push(fs.readdirSync(srcpath)[i]);
@@ -24,11 +33,13 @@ function getFiles(srcpath) {
     }
 
 
+    /**
+     * Second wrap level
+     */
     let directories = fs.readdirSync(srcpath)
         .filter(file => fs.lstatSync(path.join(srcpath, file)).isDirectory());
 
     for (let j = 0; j < directories.length; j++) {
-
         let arrayOfFiles = fs.readdirSync('dist/styles/' + directories[j]); // array of files in specific folder
 
         for (let i = 0; i < arrayOfFiles.length; i++) {
@@ -36,9 +47,26 @@ function getFiles(srcpath) {
                 components.push(directories[j] + '/' + arrayOfFiles[i]);
             }
         }
-    }
 
-    console.log('-----------------------------', components);
+        /**
+         * Third level
+         */
+        for (let i = 0; i < arrayOfFiles.length; i++) {
+
+            let findInnerDirectories = fs.readdirSync(srcpath + '/' + directories[j]);
+
+            let innerFolders = findInnerDirectories.filter(file => fs.lstatSync(path.join(srcpath + '/' + directories[j], file)).isDirectory());
+            let innerCssFiles = fs.readdirSync(srcpath + '/' + directories[j] + '/' + innerFolders);
+
+            for (let k = 0; k < innerCssFiles.length; k++) {
+
+                if (innerCssFiles[k].split('.').pop() === 'css') {
+                    components.push(directories[j] + '/' + innerFolders + '/' + innerCssFiles[k]);
+                }
+            }
+
+        }
+    }
 
     return components;
 }
